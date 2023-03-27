@@ -2,16 +2,17 @@
 
 This Chrome extension can translate selected Japanese text to Hiragana by using ChatGPT.
 
-## Setup API key
-
-1. Put the OpenAI API key to `open_api_key` variable in `background.js`.
-
 ## Load extension in Chrome
 
 1. Go to `chrome://extensions`.
 1. Change to `Developer mode`.
 1. Click `Load unpacked`.
 1. Select "this" directory.
+
+## Setup API key
+
+1. Go to option page of the extension.
+1. Put the OpenAI API key and save.
 
 ## Use it
 

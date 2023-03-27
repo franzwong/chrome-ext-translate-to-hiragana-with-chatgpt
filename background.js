@@ -1,8 +1,11 @@
+import { HiraganaService } from './hiragana_service.js';
+
+const hiraganaService = new HiraganaService();
+
 const menu_item_translate_to_hiragana = 'translate-to-hiragana';
-// TODO: Make it configurable
-const open_api_key = '';
 
 function handle_runtime_installed() {
+    console.debug('Add context menu items');
     chrome.contextMenus.create({
         id: menu_item_translate_to_hiragana,
         title: 'Translate to Hiragana',
@@ -10,52 +13,58 @@ function handle_runtime_installed() {
     });
 }
 
-async function get_hiragana(text) {
-    const payload = {
-        'model': 'gpt-3.5-turbo',
-        'messages': [{
-            'role': 'user',
-            'content': `Please change the next line to Hiragana\n${text}`
-        }]
-    };
+async function handle_menu_item_translate_to_hiragana_clicked(_, tab) {
+    try {
+        if (!hiraganaService.openAIApiKey) {
+            // TODO: Show it in UI
+            console.error('OpenAI API key is not configured');
+            return;
+        }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${open_api_key}`,
-        },
-        body: JSON.stringify(payload)
-    });
+        const { text } = await chrome.tabs.sendMessage(tab.id, {
+            type: 'get-selected-text',
+        });
 
-    const body = await response.json();
-    // TODO: Error handling
-    return body.choices[0].message.content;
+        const hiragana = await hiraganaService.get_hiragana(text);
+
+        await chrome.tabs.sendMessage(tab.id, {
+            type: 'replace-selected-text',
+            text: hiragana,
+        });
+    } catch (e) {
+        console.error(e);
+    }
 }
 
 function handle_menu_item_clicked(info, tab) {
-    console.log('Menu clicked');
+    console.debug('Menu item is clicked');
     if (info.menuItemId === menu_item_translate_to_hiragana) {
-        (async () => {
-            const {text} = await chrome.tabs.sendMessage(tab.id, {
-                type: 'get-selected-text',
-            });
+        handle_menu_item_translate_to_hiragana_clicked(info, tab);
+    }
+}
 
-            // TODO: Error handling
-            const hiragana = await get_hiragana(text);
-
-            chrome.tabs.sendMessage(tab.id, {
-                type: 'replace-selected-text',
-                text: hiragana,
-            });
-        })();
+function handle_storage_changed(changes, _) {
+    for (let [key, { newValue }] of Object.entries(changes)) {
+        if (key === 'openAIApiKey') {
+            hiraganaService.openAIApiKey = newValue;
+        }
     }
 }
 
 function background_main() {
-    console.log('background_main');
+    console.debug('background_main');
+
+    // Must be executed outside async
     chrome.runtime.onInstalled.addListener(handle_runtime_installed);
-    chrome.contextMenus.onClicked.addListener(handle_menu_item_clicked);
+
+    (async () => {
+        console.debug('Loading options.');
+        const options = await chrome.storage.sync.get({'openAIApiKey': ''});
+        hiraganaService.openAIApiKey = options.openAIApiKey;
+
+        chrome.contextMenus.onClicked.addListener(handle_menu_item_clicked);
+        chrome.storage.onChanged.addListener(handle_storage_changed);
+    })();
 }
 
 background_main();
