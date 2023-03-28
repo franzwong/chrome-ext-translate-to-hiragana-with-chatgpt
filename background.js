@@ -24,12 +24,20 @@ async function handle_menu_item_translate_to_hiragana_clicked(_, tab) {
         const { text } = await chrome.tabs.sendMessage(tab.id, {
             type: 'get-selected-text',
         });
+        await chrome.tabs.sendMessage(tab.id, {
+            type: 'change-cursor',
+            cursor: 'progress',
+        });
 
         const hiragana = await hiraganaService.get_hiragana(text);
 
         await chrome.tabs.sendMessage(tab.id, {
             type: 'replace-selected-text',
             text: hiragana,
+        });
+        await chrome.tabs.sendMessage(tab.id, {
+            type: 'change-cursor',
+            cursor: 'auto',
         });
     } catch (e) {
         console.error(e);

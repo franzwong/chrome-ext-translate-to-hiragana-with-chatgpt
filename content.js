@@ -16,6 +16,10 @@ function handle_runtime_message(message, _, sendResponse) {
             range = null;
         }
         break;
+        case 'change-cursor': {
+            document.body.style.cursor = message.cursor;
+        }
+        break;
     }
 }
 
