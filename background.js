@@ -4,6 +4,8 @@ const hiraganaService = new HiraganaService();
 
 const menu_item_translate_to_hiragana = 'translate-to-hiragana';
 
+let translating = false;
+
 function handle_runtime_installed() {
     console.debug('Add context menu items');
     chrome.contextMenus.create({
@@ -14,7 +16,14 @@ function handle_runtime_installed() {
 }
 
 async function handle_menu_item_translate_to_hiragana_clicked(_, tab) {
+    if (translating) {
+        console.warn('Translation is in progress');
+        return;
+    }
+    
     try {
+        translating = true;
+
         if (!hiraganaService.openAIApiKey) {
             // TODO: Show it in UI
             console.error('OpenAI API key is not configured');
@@ -41,6 +50,8 @@ async function handle_menu_item_translate_to_hiragana_clicked(_, tab) {
         });
     } catch (e) {
         console.error(e);
+    } finally {
+        translating = false;
     }
 }
 
