@@ -2,15 +2,64 @@
 <html>
   <head>
     <title>Translate to Hiragana Options</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        margin: 10px 20px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 100%;
+      }
+      input[type=text] {
+        padding: 8px;
+        margin: 10px 0;
+      }
+      button {
+        line-height: 24px;
+        padding: 4px 20px;
+        border-radius: 4px;
+      }
+      .input-row {
+        padding: 0.5rem 0rem 0rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      h1 {
+        display: flex;
+        align-items:center;
+        font-size: 150%;
+      }
+      h1 img {
+        height: 0.9em;
+        padding-right: 4px;
+      }
+      .status-row {
+        margin: 0px 0px 10px 0px;
+        font-size: 90%;
+      }
+      #status {
+        display: none;
+      }
+    </style>
   </head>
   <body>
-    <label for="openai_api_key">OpenAI API key</label>
-    <input type="text" id="openai_api_key" />
-
-    <div id="status"></div>
-    
-    <button id="save">Save</button>
-
+    <h1><img src="./logo128.png"/>Translate to Hiragana</h1>
+    <form id="main-form">
+      <div class="input-row">
+        <label for="openai_api_key">OpenAI API key</label>
+        <input type="text" id="openai_api_key" size="80"/>
+      </div>
+      <div id="status" class="status-row">
+        Option saved.
+      </div>
+      <div>
+        <button id="save">Save</button>
+      </div>
+    </form>
     <script src="options.js"></script>
   </body>
 </html>
