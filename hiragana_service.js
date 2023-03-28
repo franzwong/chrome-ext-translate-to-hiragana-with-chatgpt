@@ -7,13 +7,13 @@ HiraganaService.prototype.get_hiragana = async function(text) {
         'model': 'gpt-3.5-turbo',
         'messages': [{
             'role': 'user',
-            'content': 'I want you to be a translator. The text I send to you have Japanese text, digits and English characters. You only need to translate the Japanese text to Hiragana. Please keep digits and English characters as it is. Please only send me the translation.',
+            'content': 'I want you to be a translator. The text I send to you have Japanese text, digits and English characters. You only need to translate the Japanese text to Hiragana. Please keep digits and English characters as it is.',
         }, {
             'role': 'assistant',
             'content': 'Sure, I can help you with that. Please provide me with the text you would like me to translate.',
         }, {
             'role': 'user',
-            'content': `Please translate '${text}'.`,
+            'content': text,
         }]
     };
 
