@@ -4,6 +4,10 @@ const hiraganaService = new HiraganaService();
 
 const menu_item_translate_to_hiragana = 'translate-to-hiragana';
 
+const options = {
+    openAIApiKey: '',
+};
+
 let translating = false;
 
 function handle_runtime_installed() {
@@ -24,7 +28,7 @@ async function handle_menu_item_translate_to_hiragana_clicked(_, tab) {
     try {
         translating = true;
 
-        if (!hiraganaService.openAIApiKey) {
+        if (!options.openAIApiKey) {
             // TODO: Show it in UI
             console.error('OpenAI API key is not configured');
             return;
@@ -38,7 +42,7 @@ async function handle_menu_item_translate_to_hiragana_clicked(_, tab) {
             cursor: 'progress',
         });
 
-        const hiragana = await hiraganaService.get_hiragana(text);
+        const hiragana = await hiraganaService.translate(options.openAIApiKey, text);
 
         await chrome.tabs.sendMessage(tab.id, {
             type: 'replace-selected-text',
@@ -65,7 +69,7 @@ function handle_menu_item_clicked(info, tab) {
 function handle_storage_changed(changes, _) {
     for (let [key, { newValue }] of Object.entries(changes)) {
         if (key === 'openAIApiKey') {
-            hiraganaService.openAIApiKey = newValue;
+            options.openAIApiKey = newValue;
         }
     }
 }

@@ -1,8 +1,6 @@
-export function HiraganaService() {
-    this.openAIApiKey = '';
-}
+export function HiraganaService() {}
 
-HiraganaService.prototype.get_hiragana = async function(text) {
+HiraganaService.prototype.translate = async function(openAIApiKey, text) {
     const payload = {
         'model': 'gpt-3.5-turbo',
         'messages': [{
@@ -22,7 +20,7 @@ HiraganaService.prototype.get_hiragana = async function(text) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${this.openAIApiKey}`,
+            'Authorization': `Bearer ${openAIApiKey}`,
         },
         body: JSON.stringify(payload)
     });
