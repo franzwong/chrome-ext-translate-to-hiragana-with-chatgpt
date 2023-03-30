@@ -2,6 +2,8 @@
 
 This Chrome extension can translate selected Japanese text to Hiragana by using ChatGPT.
 
+![Demo](demo.gif)
+
 ## Load extension in Chrome
 
 1. Go to `chrome://extensions`.
