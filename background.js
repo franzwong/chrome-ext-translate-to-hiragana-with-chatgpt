@@ -8,7 +8,7 @@ const _options = {
     openAIApiKey: '',
 };
 
-let translating = false;
+let _translating = false;
 
 function handle_runtime_installed() {
     console.debug('Add context menu items');
@@ -20,13 +20,13 @@ function handle_runtime_installed() {
 }
 
 async function handle_menu_item_translate_to_hiragana_clicked(_, tab) {
-    if (translating) {
+    if (_translating) {
         console.warn('Translation is in progress');
         return;
     }
     
     try {
-        translating = true;
+        _translating = true;
         chrome.contextMenus.update(menu_item_translate_to_hiragana, {
             enabled: false
         });
@@ -58,7 +58,7 @@ async function handle_menu_item_translate_to_hiragana_clicked(_, tab) {
     } catch (e) {
         console.error(e);
     } finally {
-        translating = false;
+        _translating = false;
         chrome.contextMenus.update(menu_item_translate_to_hiragana, {
             enabled: true
         });
