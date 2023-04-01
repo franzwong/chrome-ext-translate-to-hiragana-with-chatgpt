@@ -1,10 +1,10 @@
 import { HiraganaService } from './hiragana_service.js';
 
-const hiraganaService = new HiraganaService();
+const _hiraganaService = new HiraganaService();
 
 const menu_item_translate_to_hiragana = 'translate-to-hiragana';
 
-const options = {
+const _options = {
     openAIApiKey: '',
 };
 
@@ -27,8 +27,11 @@ async function handle_menu_item_translate_to_hiragana_clicked(_, tab) {
     
     try {
         translating = true;
+        chrome.contextMenus.update(menu_item_translate_to_hiragana, {
+            enabled: false
+        });
 
-        if (!options.openAIApiKey) {
+        if (!_options.openAIApiKey) {
             // TODO: Show it in UI
             console.error('OpenAI API key is not configured');
             return;
@@ -42,11 +45,11 @@ async function handle_menu_item_translate_to_hiragana_clicked(_, tab) {
             cursor: 'progress',
         });
 
-        const hiragana = await hiraganaService.translate(options.openAIApiKey, text);
+        const translated_text = await _hiraganaService.translate(_options.openAIApiKey, text);
 
         await chrome.tabs.sendMessage(tab.id, {
             type: 'replace-selected-text',
-            text: hiragana,
+            text: translated_text,
         });
         await chrome.tabs.sendMessage(tab.id, {
             type: 'change-cursor',
@@ -56,6 +59,9 @@ async function handle_menu_item_translate_to_hiragana_clicked(_, tab) {
         console.error(e);
     } finally {
         translating = false;
+        chrome.contextMenus.update(menu_item_translate_to_hiragana, {
+            enabled: true
+        });
     }
 }
 
@@ -69,7 +75,8 @@ function handle_menu_item_clicked(info, tab) {
 function handle_storage_changed(changes, _) {
     for (let [key, { newValue }] of Object.entries(changes)) {
         if (key === 'openAIApiKey') {
-            options.openAIApiKey = newValue;
+            _options.openAIApiKey = newValue;
+            console.debug('OpenAI API key is updated.');
         }
     }
 }
@@ -83,7 +90,7 @@ function background_main() {
     (async () => {
         console.debug('Loading options.');
         const options = await chrome.storage.sync.get({'openAIApiKey': ''});
-        hiraganaService.openAIApiKey = options.openAIApiKey;
+        _options.openAIApiKey = options.openAIApiKey;
 
         chrome.contextMenus.onClicked.addListener(handle_menu_item_clicked);
         chrome.storage.onChanged.addListener(handle_storage_changed);
